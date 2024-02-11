@@ -3,8 +3,11 @@ import { Elements } from "@/Elements";
 import { useEffect, useState } from "react";
 import ElementCardNonDraggable from "./ElementCardNonDraggable";
 import axios from "axios";
+
 const ElementList = () => {
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
+  const [elements, setElements] =
+    useState<{ name: string; emoji: string }[]>(Elements);
   const handleClick = (element: string) => {
     console.log("clicked " + element);
     if (selectedElements.length === 2) {
@@ -13,8 +16,6 @@ const ElementList = () => {
       setSelectedElements((prev) => [...prev, element]);
     }
   };
-  const [elements, setElements] =
-    useState<{ name: string; emoji: string }[]>(Elements);
 
   const createElement = async () => {
     if (selectedElements.length === 2) {
@@ -45,10 +46,15 @@ const ElementList = () => {
           ])
         );
       }
+      setSelectedElements([]);
     }
   };
 
   const clearElements = () => {
+    // Confirm before clearing
+    if (!confirm("Are you sure you want to reset the elements?")) {
+      return;
+    }
     setElements(Elements);
     localStorage.setItem("elements", JSON.stringify(Elements));
   };
@@ -64,17 +70,23 @@ const ElementList = () => {
   }, [selectedElements]);
 
   return (
-    <div className="flex flex-row gap-5 flex-wrap justify-center">
+    <div className="flex flex-row gap-5 flex-wrap justify-center mt-5">
       {elements.map((element, index) => (
         <ElementCardNonDraggable
           key={index}
           name={element.name}
           emoji={element.emoji}
           onClick={() => handleClick(element.name)}
+          className={
+            selectedElements.includes(element.name) ? "scale-110 " : ""
+          }
         />
       ))}
-      <button className="btn btn-primary" onClick={() => clearElements()}>
-        Clear Data
+      <button
+        className="btn btn-ghost absolute bottom-0 left-0"
+        onClick={() => clearElements()}
+      >
+        Reset
       </button>
     </div>
   );

@@ -15,7 +15,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-draggable": "^4.4.6",
-    "tw-merge": "^0.0.1-alpha.3"
+    "react-icons": "^5.0.1",
+    "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",
