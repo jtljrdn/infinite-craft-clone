@@ -1,3 +1,5 @@
+import { connectToDatabase } from "@/utils/db/connectToDb";
+import Elements from "@/utils/db/models/element.model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -5,10 +7,31 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const element1 = params.get("element1");
   const element2 = params.get("element2");
+
   if (!element1 || !element2) {
     return NextResponse.json(
       { erorr: "Missing element1 or element2" },
       { status: 400 }
+    );
+  }
+  await connectToDatabase();
+  let isNew = true;
+  console.log("Checking if element exists");
+  const element = await Elements.find({
+    parentElements: [[element1], [element2]],
+  });
+  if (element.length > 0) {
+    isNew = false;
+    console.log("Element already exists");
+    const randomIndex = Math.floor(Math.random() * element.length);
+    console.log(element[randomIndex]);
+    return NextResponse.json(
+      {
+        name: element[randomIndex].name,
+        emoji: element[randomIndex].emoji,
+        new: isNew,
+      },
+      { status: 200 }
     );
   }
   const openai = new OpenAI({
@@ -27,10 +50,16 @@ export async function GET(request: NextRequest) {
   const response = chatCompletion.choices[0].message.content;
   if (response) {
     const { new_element, emoji } = JSON.parse(response);
+    const newElement = await Elements.create({
+      name: new_element,
+      emoji: emoji,
+      parentElements: [element1, element2],
+    });
     return NextResponse.json(
       {
-        emoji: emoji,
-        name: new_element,
+        name: newElement.name,
+        emoji: newElement.emoji,
+        new: isNew,
       },
       { status: 200 }
     );

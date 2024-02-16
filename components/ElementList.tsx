@@ -46,7 +46,9 @@ const ElementList = () => {
           ])
         );
       }
-      setSelectedElements([]);
+      setTimeout(() => {
+        setSelectedElements([]);
+      }, 300);
     }
   };
 
@@ -82,6 +84,8 @@ const ElementList = () => {
           }
         />
       ))}
+      {/* small popup that shows if the user found a new element */}
+
       <button
         className="btn btn-ghost absolute bottom-0 left-0"
         onClick={() => clearElements()}
