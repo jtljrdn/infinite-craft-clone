@@ -9,11 +9,9 @@ Attempt to recreate Infinite Craft by [neal.fun](https://neal.fun)
 
 - Next.js
 - MongoDB
-- OpenAI API (Currently GPT-4.0)
+- OpenAI API (Currently GPT-3.5-Turbo)
 - Vercel
 
 ## TODO
 
-- Add contact info
 - Spot for user to add their own openai token bc its expensive and im broke
-- Add user-facing errors
