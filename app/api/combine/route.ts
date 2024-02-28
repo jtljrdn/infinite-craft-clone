@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
   });
   const chatCompletion = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-3.5-turbo",
     messages: [
       {
         role: "system",
