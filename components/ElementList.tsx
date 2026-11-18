@@ -154,7 +154,7 @@ const ElementList = () => {
             by Neal
           </p>
           <p className="pb-4">
-            If it's not working, it's because I'm not paying for more OpenAI
+            If it&apos;s not working, it&apos;s because I&apos;m not paying for more OpenAI
             credit right now.{" "}
             <Link
               href="https://ko-fi.com/jtljrdn"
