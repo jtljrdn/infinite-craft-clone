@@ -1,9 +1,5 @@
-import ElementList from "@/components/ElementList";
+import { CraftGame } from "@/components/craft/craft-game";
 
 export default function Home() {
-  return (
-    <div className="max-w-2xl min-h-screen">
-      <ElementList />
-    </div>
-  );
+  return <CraftGame />;
 }
