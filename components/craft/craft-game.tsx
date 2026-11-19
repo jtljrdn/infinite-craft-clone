@@ -63,7 +63,7 @@ export function CraftGame() {
     if (!dragged) return null;
     let best: { id: string; area: number } | null = null;
     for (const item of items) {
-      if (item.id === draggedId || item.combining) continue;
+      if (item.id === draggedId || item.combining || item.leaving) continue;
       const rect = itemNode(item.id)?.getBoundingClientRect();
       if (!rect) continue;
       const area = overlapArea(dragged, rect);
@@ -116,7 +116,7 @@ export function CraftGame() {
     event: React.PointerEvent<HTMLDivElement>,
     item: CanvasItem,
   ) => {
-    if (item.combining || dragRef.current) return;
+    if (item.combining || item.leaving || dragRef.current) return;
     updateItem(item.id, { z: topZ() });
     startDrag(event, item.id, item.element, "canvas");
   };
@@ -181,7 +181,10 @@ export function CraftGame() {
     const canvas = canvasRef.current?.getBoundingClientRect();
     const rect = itemNode(id)?.getBoundingClientRect();
     if (!canvas || !rect) return;
-    const maxX = Math.max(EDGE_PADDING, canvas.width - rect.width - EDGE_PADDING);
+    const maxX = Math.max(
+      EDGE_PADDING,
+      canvas.width - rect.width - EDGE_PADDING,
+    );
     const maxY = Math.max(
       EDGE_PADDING,
       canvas.height - rect.height - EDGE_PADDING,
@@ -221,7 +224,7 @@ export function CraftGame() {
       const element = { name: result.name, emoji: result.emoji };
       setItems((prev) => {
         const anchor = prev.find((item) => item.id === targetId);
-        if (!anchor) return prev;
+        if (!anchor || anchor.leaving) return prev;
         const z = prev.reduce((max, item) => Math.max(max, item.z), 0) + 1;
         return [
           ...prev.filter(
@@ -293,7 +296,7 @@ export function CraftGame() {
   };
 
   const duplicate = (item: CanvasItem) => {
-    if (item.combining) return;
+    if (item.combining || item.leaving) return;
     setItems((prev) => [
       ...prev,
       {
@@ -305,6 +308,20 @@ export function CraftGame() {
         celebrate: false,
       },
     ]);
+  };
+
+  const clearCanvas = () => {
+    const width = canvasRef.current?.clientWidth || 1;
+    setItems((prev) =>
+      prev.map((item) => ({
+        ...item,
+        leaving: true,
+        celebrate: false,
+        leaveDelay: Math.round(
+          Math.min(1, Math.max(0, 1 - item.x / width)) * 320,
+        ),
+      })),
+    );
   };
 
   const resetProgress = () => {
@@ -324,7 +341,9 @@ export function CraftGame() {
         onItemPointerUp={handlePointerUp}
         onItemDoubleClick={duplicate}
         onItemCelebrationEnd={(id) => updateItem(id, { celebrate: false })}
-        onClear={() => setItems([])}
+        sweeping={items.some((item) => item.leaving)}
+        onClear={clearCanvas}
+        onItemLeft={(id) => removeItems(id)}
       />
       <ElementSidebar
         elements={discovered}

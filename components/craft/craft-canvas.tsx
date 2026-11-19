@@ -19,7 +19,11 @@ export type CanvasItem = {
   z: number;
   combining: boolean;
   celebrate?: boolean;
+  leaving?: boolean;
+  leaveDelay?: number;
 };
+
+const LEAVE_ANIMATIONS = new Set(["canvas-sweep-out", "canvas-fade-away"]);
 
 type CraftCanvasProps = {
   ref: React.Ref<HTMLDivElement>;
@@ -34,6 +38,8 @@ type CraftCanvasProps = {
   onItemPointerUp: (event: React.PointerEvent<HTMLDivElement>) => void;
   onItemDoubleClick: (item: CanvasItem) => void;
   onItemCelebrationEnd: (id: string) => void;
+  onItemLeft: (id: string) => void;
+  sweeping: boolean;
   onClear: () => void;
 };
 
@@ -47,6 +53,8 @@ export function CraftCanvas({
   onItemPointerUp,
   onItemDoubleClick,
   onItemCelebrationEnd,
+  onItemLeft,
+  sweeping,
   onClear,
 }: CraftCanvasProps) {
   return (
@@ -63,9 +71,15 @@ export function CraftCanvas({
             variant="outline"
             size="sm"
             className="pointer-events-auto"
+            disabled={sweeping}
             onClick={onClear}
           >
-            <BrushCleaningIcon data-icon="inline-start" />
+            <BrushCleaningIcon
+              data-icon="inline-start"
+              className={cn(
+                sweeping && "animate-broom-sweep motion-reduce:animate-none",
+              )}
+            />
             Clear canvas
           </Button>
         )}
@@ -79,8 +93,7 @@ export function CraftCanvas({
             </EmptyMedia>
             <EmptyTitle>Drag elements here</EmptyTitle>
             <EmptyDescription>
-              Drop one element on top of another to combine them. Click an
-              element in the list to add it. Double-click one here to copy it.
+              Combine elements to get started.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -91,7 +104,7 @@ export function CraftCanvas({
           key={item.id}
           data-item-id={item.id}
           element={item.element}
-          celebrate={item.celebrate}
+          celebrate={item.celebrate && !item.leaving}
           state={
             item.combining
               ? "combining"
@@ -103,19 +116,27 @@ export function CraftCanvas({
           }
           className={cn(
             "absolute top-0 left-0 data-[state=combining]:pointer-events-none",
-            !item.celebrate && "animate-in duration-200 zoom-in-75 fade-in",
+            item.leaving
+              ? "pointer-events-none animate-sweep-out motion-reduce:animate-fade-away"
+              : !item.celebrate && "animate-in duration-200 zoom-in-75 fade-in",
           )}
-          style={{ translate: `${item.x}px ${item.y}px`, zIndex: item.z }}
+          style={{
+            translate: `${item.x}px ${item.y}px`,
+            zIndex: item.z,
+            animationDelay: item.leaving
+              ? `${item.leaveDelay ?? 0}ms`
+              : undefined,
+          }}
           onPointerDown={(event) => onItemPointerDown(event, item)}
           onPointerMove={onItemPointerMove}
           onPointerUp={onItemPointerUp}
           onPointerCancel={onItemPointerUp}
           onDoubleClick={() => onItemDoubleClick(item)}
           onAnimationEnd={(event) => {
-            if (
-              event.target === event.currentTarget &&
-              event.animationName === "discovery-fade"
-            ) {
+            if (event.target !== event.currentTarget) return;
+            if (item.leaving && LEAVE_ANIMATIONS.has(event.animationName)) {
+              onItemLeft(item.id);
+            } else if (event.animationName === "discovery-fade") {
               onItemCelebrationEnd(item.id);
             }
           }}

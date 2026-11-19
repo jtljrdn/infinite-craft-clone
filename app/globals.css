@@ -228,3 +228,39 @@
   50% { transform: rotate(var(--angle)) translateX(calc(var(--distance) * 0.8)) scale(1); opacity: 1; }
   100% { transform: rotate(var(--angle)) translateX(var(--distance)) translateY(10px) scale(0.4); opacity: 0; }
 }
+
+@utility animate-broom-sweep {
+  transform-origin: 50% 10%;
+  animation: broom-sweep 750ms ease-in-out;
+}
+
+@utility animate-sweep-out {
+  animation: canvas-sweep-out 450ms cubic-bezier(0.55, 0, 0.75, 0.2) both;
+}
+
+@utility animate-fade-away {
+  animation: canvas-fade-away 300ms ease-out both;
+}
+
+@keyframes broom-sweep {
+  0% { transform: rotate(0) translateX(0); }
+  18% { transform: rotate(28deg) translateX(1px); }
+  40% { transform: rotate(-26deg) translateX(-2px); }
+  60% { transform: rotate(22deg) translateX(1px); }
+  80% { transform: rotate(-14deg) translateX(-1px); }
+  100% { transform: rotate(0) translateX(0); }
+}
+
+@keyframes canvas-sweep-out {
+  0% { transform: none; opacity: 1; filter: blur(0); }
+  25% { transform: translateX(10px) rotate(4deg); opacity: 1; }
+  100% {
+    transform: translate(-180px, -12px) rotate(-18deg) scale(0.6);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes canvas-fade-away {
+  to { opacity: 0; }
+}
