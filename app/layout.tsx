@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Infinite Crafter Clone",
+  title: "Crafter",
   description: "Combine elements to create new ones, forever!",
 };
 
@@ -16,12 +17,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" className="">
-      <body className={inter.className}>
-        <div className="relative flex items-center flex-col justify-center min-w-96 mx-auto">
-          <Analytics />
-          {children}
-        </div>
+    <html lang="en" className={geist.variable}>
+      <body className="overscroll-none antialiased">
+        <Toaster>{children}</Toaster>
+        <Analytics />
       </body>
     </html>
   );
