@@ -6,6 +6,7 @@ import {
   combineElements,
   discoveredStore,
   useDiscoveredElements,
+  STARTER_ELEMENTS,
   type CraftElement,
 } from "@/lib/elements";
 import { CraftCanvas, type CanvasItem } from "./craft-canvas";
@@ -48,6 +49,7 @@ export function CraftGame() {
   const [items, setItems] = useState<CanvasItem[]>([]);
   const dragRef = useRef<DragState | null>(null);
   const [drag, setDragState] = useState<DragState | null>(null);
+  const [justAdded, setJustAdded] = useState<string | null>(null);
 
   const setDrag = (next: DragState | null) => {
     dragRef.current = next;
@@ -245,13 +247,7 @@ export function CraftGame() {
         ...element,
         firstDiscovery: result.new || undefined,
       });
-      if (added && !result.new) {
-        toast.add({
-          title: `${element.emoji} ${element.name}`,
-          description: "New element added to your list.",
-          type: "success",
-        });
-      }
+      if (added) setJustAdded(element.name);
     } catch {
       setItems((prev) =>
         prev.map((item) =>
@@ -342,11 +338,13 @@ export function CraftGame() {
         onItemDoubleClick={duplicate}
         onItemCelebrationEnd={(id) => updateItem(id, { celebrate: false })}
         sweeping={items.some((item) => item.leaving)}
+        showHint={discovered.length <= STARTER_ELEMENTS.length}
         onClear={clearCanvas}
         onItemLeft={(id) => removeItems(id)}
       />
       <ElementSidebar
         elements={discovered}
+        justAdded={justAdded}
         isRemoveTarget={Boolean(drag?.moved && drag.overSidebar)}
         onChipPointerDown={handleSidebarPointerDown}
         onChipPointerMove={handlePointerMove}

@@ -25,6 +25,7 @@ import { ResetDialog } from "./reset-dialog";
 
 type ElementSidebarProps = {
   elements: readonly CraftElement[];
+  justAdded: string | null;
   isRemoveTarget: boolean;
   onChipPointerDown: (
     event: React.PointerEvent<HTMLDivElement>,
@@ -35,8 +36,13 @@ type ElementSidebarProps = {
   onReset: () => void;
 };
 
+const revealInList = (node: HTMLLIElement | null) => {
+  node?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+};
+
 export function ElementSidebar({
   elements,
+  justAdded,
   isRemoveTarget,
   onChipPointerDown,
   onChipPointerMove,
@@ -77,11 +83,19 @@ export function ElementSidebar({
         {visible.length > 0 ? (
           <ul className="flex flex-wrap content-start gap-1.5 p-4">
             {visible.map((element) => (
-              <li key={element.name} className="max-w-full">
+              <li
+                key={element.name}
+                ref={element.name === justAdded ? revealInList : undefined}
+                className="max-w-full"
+              >
                 <ElementChip
                   element={element}
                   size="sm"
                   showFirstMark
+                  className={cn(
+                    element.name === justAdded &&
+                      "animate-list-pop motion-reduce:animate-none",
+                  )}
                   onPointerDown={(event) => onChipPointerDown(event, element)}
                   onPointerMove={onChipPointerMove}
                   onPointerUp={onChipPointerUp}

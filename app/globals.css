@@ -264,3 +264,14 @@
 @keyframes canvas-fade-away {
   to { opacity: 0; }
 }
+
+@utility animate-list-pop {
+  animation: list-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes list-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  55% { transform: scale(1.15); opacity: 1; }
+  80% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}

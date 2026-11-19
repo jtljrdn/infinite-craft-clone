@@ -40,6 +40,7 @@ type CraftCanvasProps = {
   onItemCelebrationEnd: (id: string) => void;
   onItemLeft: (id: string) => void;
   sweeping: boolean;
+  showHint: boolean;
   onClear: () => void;
 };
 
@@ -55,6 +56,7 @@ export function CraftCanvas({
   onItemCelebrationEnd,
   onItemLeft,
   sweeping,
+  showHint,
   onClear,
 }: CraftCanvasProps) {
   return (
@@ -85,8 +87,8 @@ export function CraftCanvas({
         )}
       </header>
 
-      {items.length === 0 && (
-        <Empty className="pointer-events-none absolute inset-0">
+      {showHint && items.length === 0 && (
+        <Empty className="pointer-events-none absolute inset-0 animate-in duration-500 fill-mode-both fade-in delay-200">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <MousePointerClickIcon />
